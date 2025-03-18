@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WMS-DB by Mustafa</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>WMS-DB by Mustafa</h1>
+            <p>استكشف مخطط قاعدة البيانات وتعرف على العلاقات والعمليات في نظام إدارة المستودعات</p>
+            <div class="search-container">
+                <input type="text" id="searchInput" placeholder="ابحث عن جدول أو عمود...">
+                <button type="button"><i class="fas fa-search"></i></button>
+            </div>
+        </div>
+    </header>
+
+    <nav>
+        <div class="container">
+            <ul>
+                <li><a href="#" class="active" data-section="categories">الفئات</a></li>
+                <li><a href="#" data-section="schema">المخطط</a></li>
+                <li><a href="#" data-section="workflows">تدفقات العمل</a></li>
+                <li><a href="#" data-section="dictionary">قاموس البيانات</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <main class="container">
+        <!-- Categories Section -->
+        <section id="categories" class="active-section">
+            <h2>فئات الجداول</h2>
+            <div class="categories-grid">
+                <!-- Categories will be loaded here via JavaScript -->
+            </div>
+        </section>
+
+        <!-- Schema Section -->
+        <section id="schema">
+            <h2>المخطط التفاعلي</h2>
+            <div class="schema-controls">
+                <select id="categoryFilter">
+                    <option value="">جميع الفئات</option>
+                    <!-- Categories will be loaded here via JavaScript -->
+                </select>
+                <button id="zoomIn"><i class="fas fa-search-plus"></i></button>
+                <button id="zoomOut"><i class="fas fa-search-minus"></i></button>
+                <button id="resetView"><i class="fas fa-sync"></i></button>
+            </div>
+            <div class="schema-container">
+                <div id="schemaViewer">
+                    <!-- Schema will be rendered here via JavaScript -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Workflows Section -->
+        <section id="workflows">
+            <h2>تدفقات العمل</h2>
+            <div class="workflow-tabs">
+                <button class="workflow-tab active" data-workflow="inbound">طلبات الوارد</button>
+                <button class="workflow-tab" data-workflow="outbound">طلبات الصادر</button>
+                <button class="workflow-tab" data-workflow="inventory">إدارة المخزون</button>
+            </div>
+            <div class="workflow-content">
+                <!-- Workflow content will be loaded here via JavaScript -->
+            </div>
+        </section>
+
+        <!-- Dictionary Section -->
+        <section id="dictionary">
+            <h2>قاموس البيانات</h2>
+            <div class="dictionary-controls">
+                <input type="text" id="dictionarySearch" placeholder="بحث في قاموس البيانات...">
+            </div>
+            <div class="dictionary-table-container">
+                <table id="dictionaryTable">
+                    <thead>
+                        <tr>
+                            <th>الجدول</th>
+                            <th>العمود</th>
+                            <th>نوع البيانات</th>
+                            <th>القيود</th>
+                            <th>الوصف</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Dictionary data will be loaded here via JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Table Details Modal -->
+        <div id="tableDetailsModal" class="modal">
+            <div class="modal-content">
+                <span class="close">&times;</span>
+                <div class="modal-tabs">
+                    <button class="modal-tab active" data-tab="details">تفاصيل الجدول</button>
+                    <button class="modal-tab" data-tab="relationships">العلاقات</button>
+                    <button class="modal-tab" data-tab="usage">نصائح الاستخدام</button>
+                </div>
+                <div class="modal-body">
+                    <!-- Modal content will be loaded here via JavaScript -->
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>WMS by Mustafa &copy; 2025</p>
+        </div>
+    </footer>
+
+    <script src="schema-data.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
