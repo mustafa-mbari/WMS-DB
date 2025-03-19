@@ -1,21 +1,12 @@
-// Schema data for the WMS Interactive Website
 const schemaData = {
   categories: [
-    {
-      id: "warehouse_structure",
-      name: "هيكل المستودع",
-      name_en: "Warehouse Structure",
-      description: "تعريف المستودعات والمناطق والمواقع",
-      description_en: "Definition of warehouses, zones, and locations",
-      tables: ["warehouses", "zones", "locations"]
-    },
     {
       id: "inventory_management",
       name: "إدارة المخزون",
       name_en: "Inventory Management",
-      description: "تتبع المخزون والدفعات والحركات",
-      description_en: "Tracking inventory, lots, and movements",
-      tables: ["inventory", "inventory_transactions", "lot_tracking"]
+      description: "إدارة المخزون والمواقع والحركات",
+      description_en: "Managing inventory, locations and movements",
+      tables: ["inventory", "locations", "inventory_movements", "inventory_counts", "inventory_adjustments"]
     },
     {
       id: "operations_management",
@@ -23,63 +14,23 @@ const schemaData = {
       name_en: "Operations Management",
       description: "معالجة طلبات الوارد والصادر وأوامر العمل",
       description_en: "Processing inbound, outbound orders and work orders",
-      tables: ["inbound_orders", "inbound_order_lines", "outbound_orders", "outbound_order_lines", "work_orders", "work_order_lines"]
+      tables: ["inbound_orders", "inbound_order_lines", "outbound_orders", "outbound_order_lines", "work_orders", "work_order_lines", "purchase_orders", "goods_receipt", "supply_orders", "goods_shipment"]
     },
     {
       id: "resource_management",
       name: "إدارة الموارد والمعدات",
       name_en: "Resource Management",
-      description: "تتبع المعدات وتعييناتها",
-      description_en: "Tracking equipment and assignments",
-      tables: ["equipment", "equipment_assignments"]
+      description: "إدارة الموارد البشرية والمعدات",
+      description_en: "Managing human resources and equipment",
+      tables: ["employees", "shifts", "equipment", "maintenance_orders"]
     },
     {
       id: "partner_management",
-      name: "إدارة الشركاء التجاريين",
-      name_en: "Business Partner Management",
-      description: "تسجيل الموردين والعملاء",
-      description_en: "Recording suppliers and customers",
-      tables: ["suppliers", "customers"]
-    },
-    {
-      id: "uom_barcode",
-      name: "وحدات القياس والباركود",
-      name_en: "UOM and Barcode",
-      description: "إدارة وحدات القياس والباركود",
-      description_en: "Managing units of measure and barcodes",
-      tables: ["uom", "product_barcodes"]
-    },
-    {
-      id: "quality_control",
-      name: "مراقبة الجودة",
-      name_en: "Quality Control",
-      description: "إجراءات فحص الجودة",
-      description_en: "Quality inspection procedures",
-      tables: ["quality_control", "qc_parameters"]
-    },
-    {
-      id: "reports_statistics",
-      name: "التقارير والإحصائيات",
-      name_en: "Reports and Statistics",
-      description: "سجل التدقيق ومؤشرات الأداء",
-      description_en: "Audit logs and KPI metrics",
-      tables: ["audit_log", "kpi_metrics"]
-    },
-    {
-      id: "settings_configuration",
-      name: "الإعدادات والتكوين",
-      name_en: "Settings and Configuration",
-      description: "إعدادات النظام والمستودع",
-      description_en: "System and warehouse settings",
-      tables: ["system_settings", "warehouse_settings"]
-    },
-    {
-      id: "user_management",
-      name: "إدارة المستخدمين",
-      name_en: "User Management",
-      description: "إدارة المستخدمين والأدوار والصلاحيات",
-      description_en: "Managing users, roles and permissions",
-      tables: ["users", "roles", "user_roles"]
+      name: "إدارة الشركاء",
+      name_en: "Partner Management",
+      description: "إدارة العملاء والموردين والناقلين",
+      description_en: "Managing customers, suppliers and carriers",
+      tables: ["customers", "suppliers", "carriers", "contracts"]
     },
     {
       id: "product_management",
@@ -87,210 +38,397 @@ const schemaData = {
       name_en: "Product Management",
       description: "إدارة المنتجات وفئاتها وعائلاتها",
       description_en: "Managing products, categories and families",
-      tables: ["products", "product_categories", "product_families", "owners"]
+      tables: ["products", "product_categories", "product_families", "owners", "product_classifications", "measurement_units", "product_specifications", "product_alternatives", "product_images"]
+    },
+    {
+      id: "system_management",
+      name: "إدارة النظام",
+      name_en: "System Management",
+      description: "إدارة مستخدمي النظام والأدوار والصلاحيات",
+      description_en: "Managing users, roles and permissions",
+      tables: ["users", "roles", "user_roles"]
     }
   ],
   tables: [
     {
-      id: "warehouses",
-      name: "المستودعات",
-      name_en: "Warehouses",
-      category: "warehouse_structure",
-      description: "تخزين معلومات المستودعات المختلفة في النظام",
-      description_en: "Stores information about different warehouses in the system",
+      id: "inventory",
+      name: "المخزون",
+      name_en: "Inventory",
+      category: "inventory_management",
+      description: "سجلات المخزون الحالي",
+      description_en: "Current inventory records",
       columns: [
-        {name: "warehouse_key", type: "BIGSERIAL", primary_key: true, description: "المفتاح الأساسي للمستودع"},
-        {name: "warehouse_id", type: "VARCHAR(64)", unique: true, not_null: true, description: "معرف المستودع الفريد"},
-        {name: "name", type: "VARCHAR(256)", not_null: true, description: "اسم المستودع"},
-        {name: "description", type: "VARCHAR(2048)", description: "وصف المستودع"},
-        {name: "address", type: "VARCHAR(512)", description: "عنوان المستودع"},
-        {name: "city", type: "VARCHAR(128)", description: "المدينة"},
-        {name: "state", type: "VARCHAR(128)", description: "الولاية/المنطقة"},
-        {name: "country", type: "VARCHAR(128)", description: "الدولة"},
-        {name: "postal_code", type: "VARCHAR(64)", description: "الرمز البريدي"},
-        {name: "status", type: "VARCHAR(32)", default: "ACTIVE", description: "حالة المستودع (نشط، غير نشط، إلخ)"},
-        {name: "is_default", type: "BOOLEAN", default: "FALSE", description: "ما إذا كان هذا هو المستودع الافتراضي"},
-        {name: "class_type", type: "VARCHAR(32)", description: "نوع الفئة"},
-        {name: "transaction_count", type: "NUMERIC(10)", description: "عدد المعاملات"},
-        {name: "created_by", type: "VARCHAR(64)", description: "تم إنشاؤه بواسطة"},
-        {name: "create_date", type: "TIMESTAMP", default: "CURRENT_TIMESTAMP", description: "تاريخ الإنشاء"},
-        {name: "updated_by", type: "VARCHAR(64)", description: "تم تحديثه بواسطة"},
-        {name: "update_date", type: "TIMESTAMP", default: "CURRENT_TIMESTAMP", description: "تاريخ التحديث"}
-      ],
-      relationships: [
-        {table: "zones", type: "one-to-many", description: "المستودع يحتوي على عدة مناطق"},
-        {table: "locations", type: "one-to-many", description: "المستودع يحتوي على عدة مواقع"},
-        {table: "inbound_orders", type: "one-to-many", description: "المستودع يستقبل عدة طلبات واردة"},
-        {table: "outbound_orders", type: "one-to-many", description: "المستودع يرسل عدة طلبات صادرة"},
-        {table: "work_orders", type: "one-to-many", description: "المستودع يحتوي على عدة أوامر عمل"},
-        {table: "equipment", type: "one-to-many", description: "المستودع يحتوي على عدة معدات"},
-        {table: "warehouse_settings", type: "one-to-many", description: "المستودع له عدة إعدادات"}
-      ],
-      usage_tips: [
-        {
-          title: "إنشاء مستودعات متعددة",
-          description: "يمكنك إنشاء مستودعات متعددة لإدارة مواقع مختلفة. تأكد من تعيين is_default = TRUE لمستودع واحد فقط.",
-          example: "INSERT INTO warehouses (warehouse_id, name, status) VALUES ('WH001', 'المستودع الرئيسي', 'ACTIVE');"
-        },
-        {
-          title: "تحديث حالة المستودع",
-          description: "استخدم حقل status لتحديد ما إذا كان المستودع نشطًا أو في الصيانة أو مغلقًا.",
-          example: "UPDATE warehouses SET status = 'MAINTENANCE' WHERE warehouse_id = 'WH001';"
-        },
-        {
-          title: "ربط المستودع بالمناطق",
-          description: "كل مستودع يمكن أن يحتوي على عدة مناطق. استخدم warehouse_key كمفتاح خارجي في جدول zones.",
-          example: "SELECT z.* FROM zones z JOIN warehouses w ON z.warehouse_key = w.warehouse_key WHERE w.warehouse_id = 'WH001';"
-        }
-      ]
-    },
-    {
-      id: "zones",
-      name: "المناطق",
-      name_en: "Zones",
-      category: "warehouse_structure",
-      description: "تقسيم المستودع إلى مناطق وظيفية مختلفة",
-      description_en: "Division of warehouse into different functional zones",
-      columns: [
-        {name: "zone_key", type: "BIGSERIAL", primary_key: true, description: "المفتاح الأساسي للمنطقة"},
-        {name: "zone_id", type: "VARCHAR(64)", unique: true, not_null: true, description: "معرف المنطقة الفريد"},
-        {name: "warehouse_key", type: "BIGINT", not_null: true, foreign_key: "warehouses.warehouse_key", description: "المفتاح الخارجي للمستودع"},
-        {name: "name", type: "VARCHAR(256)", not_null: true, description: "اسم المنطقة"},
-        {name: "description", type: "VARCHAR(2048)", description: "وصف المنطقة"},
-        {name: "zone_type", type: "VARCHAR(64)", description: "نوع المنطقة (استلام، تخزين، تجميع، تعبئة، شحن، إلخ)"},
-        {name: "status", type: "VARCHAR(32)", default: "ACTIVE", description: "حالة المنطقة"},
-        {name: "class_type", type: "VARCHAR(32)", description: "نوع الفئة"},
-        {name: "transaction_count", type: "NUMERIC(10)", description: "عدد المعاملات"},
-        {name: "created_by", type: "VARCHAR(64)", description: "تم إنشاؤه بواسطة"},
-        {name: "create_date", type: "TIMESTAMP", default: "CURRENT_TIMESTAMP", description: "تاريخ الإنشاء"},
-        {name: "updated_by", type: "VARCHAR(64)", description: "تم تحديثه بواسطة"},
-        {name: "update_date", type: "TIMESTAMP", default: "CURRENT_TIMESTAMP", description: "تاريخ التحديث"}
-      ],
-      relationships: [
-        {table: "warehouses", type: "many-to-one", description: "المنطقة تنتمي إلى مستودع"},
-        {table: "locations", type: "one-to-many", description: "المنطقة تحتوي على عدة مواقع"},
-        {table: "work_orders", type: "one-to-many", description: "المنطقة يمكن أن تكون مرتبطة بعدة أوامر عمل"}
-      ],
-      usage_tips: [
-        {
-          title: "إنشاء مناطق وظيفية",
-          description: "قم بإنشاء مناطق مختلفة لكل وظيفة في المستودع (استلام، تخزين، تجميع، إلخ).",
-          example: "INSERT INTO zones (zone_id, warehouse_key, name, zone_type) VALUES ('RECV01', 1, 'منطقة الاستلام', 'RECEIVING');"
-        },
-        {
-          title: "تحديد نوع المنطقة",
-          description: "استخدم حقل zone_type لتحديد الغرض من المنطقة، مما يساعد في توجيه العمليات.",
-          example: "SELECT * FROM zones WHERE zone_type = 'STORAGE' AND warehouse_key = 1;"
-        }
+        { name: "رقم المخزون", name_en: "inventory_id", type: "رقم", primaryKey: true },
+        { name: "رقم المنتج", name_en: "product_id", type: "رقم", foreignKey: "products" },
+        { name: "رقم الموقع", name_en: "location_id", type: "رقم", foreignKey: "locations" },
+        { name: "الكمية", name_en: "quantity", type: "عدد" },
+        { name: "وحدة القياس", name_en: "uom", type: "نص" },
+        { name: "رقم الدفعة", name_en: "lot_number", type: "نص" },
+        { name: "تاريخ الإنتاج", name_en: "production_date", type: "تاريخ" },
+        { name: "تاريخ انتهاء الصلاحية", name_en: "expiry_date", type: "تاريخ" },
+        { name: "الحالة", name_en: "status", type: "نص" },
+        { name: "تاريخ آخر تحديث", name_en: "last_updated", type: "تاريخ ووقت" }
       ]
     },
     {
       id: "locations",
       name: "المواقع",
       name_en: "Locations",
-      category: "warehouse_structure",
-      description: "المواقع الفعلية داخل المستودع حيث يتم تخزين المنتجات",
-      description_en: "Actual locations within the warehouse where products are stored",
+      category: "inventory_management",
+      description: "مواقع التخزين في المستودع",
+      description_en: "Storage locations in the warehouse",
       columns: [
-        {name: "location_key", type: "BIGSERIAL", primary_key: true, description: "المفتاح الأساسي للموقع"},
-        {name: "location_id", type: "VARCHAR(64)", unique: true, not_null: true, description: "معرف الموقع الفريد"},
-        {name: "warehouse_key", type: "BIGINT", not_null: true, foreign_key: "warehouses.warehouse_key", description: "المفتاح الخارجي للمستودع"},
-        {name: "zone_key", type: "BIGINT", foreign_key: "zones.zone_key", description: "المفتاح الخارجي للمنطقة"},
-        {name: "aisle", type: "VARCHAR(64)", description: "الممر"},
-        {name: "bay", type: "VARCHAR(64)", description: "الخليج"},
-        {name: "level", type: "VARCHAR(64)", description: "المستوى"},
-        {name: "position", type: "VARCHAR(64)", description: "الموضع"},
-        {name: "location_type", type: "VARCHAR(64)", description: "نوع الموقع (رف، صندوق، تخزين ضخم، أرضية، إلخ)"},
-        {name: "status", type: "VARCHAR(32)", default: "ACTIVE", description: "حالة الموقع"},
-        {name: "is_pickable", type: "BOOLEAN", default: "TRUE", description: "ما إذا كان يمكن التقاط المنتجات من هذا الموقع"},
-        {name: "is_storable", type: "BOOLEAN", default: "TRUE", description: "ما إذا كان يمكن تخزين المنتجات في هذا الموقع"},
-        {name: "max_weight", type: "NUMERIC(19,4)", description: "الوزن الأقصى المسموح به"},
-        {name: "max_volume", type: "NUMERIC(19,4)", description: "الحجم الأقصى المسموح به"},
-        {name: "max_items", type: "NUMERIC(10)", description: "الحد الأقصى لعدد العناصر"},
-        {name: "barcode", type: "VARCHAR(128)", description: "الباركود الخاص بالموقع"},
-        {name: "class_type", type: "VARCHAR(32)", description: "نوع الفئة"},
-        {name: "transaction_count", type: "NUMERIC(10)", description: "عدد المعاملات"},
-        {name: "created_by", type: "VARCHAR(64)", description: "تم إنشاؤه بواسطة"},
-        {name: "create_date", type: "TIMESTAMP", default: "CURRENT_TIMESTAMP", description: "تاريخ الإنشاء"},
-        {name: "updated_by", type: "VARCHAR(64)", description: "تم تحديثه بواسطة"},
-        {name: "update_date", type: "TIMESTAMP", default: "CURRENT_TIMESTAMP", description: "تاريخ التحديث"}
-      ],
-      relationships: [
-        {table: "warehouses", type: "many-to-one", description: "الموقع ينتمي إلى مستودع"},
-        {table: "zones", type: "many-to-one", description: "الموقع ينتمي إلى منطقة"},
-        {table: "inventory", type: "one-to-many", description: "الموقع يمكن أن يحتوي على عدة عناصر مخزون"}
-      ],
-      usage_tips: [
-        {
-          title: "تنظيم المواقع",
-          description: "استخدم حقول aisle و bay و level و position لتنظيم المواقع بطريقة منطقية.",
-          example: "INSERT INTO locations (location_id, warehouse_key, zone_key, aisle, bay, level, position) VALUES ('A01-B02-C03-D04', 1, 1, 'A01', 'B02', 'C03', 'D04');"
-        },
-        {
-          title: "تحديد قيود المواقع",
-          description: "استخدم حقول max_weight و max_volume و max_items لتحديد قيود السعة للموقع.",
-          example: "UPDATE locations SET max_weight = 500, max_volume = 2.5, max_items = 100 WHERE location_id = 'A01-B02-C03-D04';"
-        }
+        { name: "رقم الموقع", name_en: "location_id", type: "رقم", primaryKey: true },
+        { name: "اسم الموقع", name_en: "location_name", type: "نص" },
+        { name: "نوع الموقع", name_en: "location_type", type: "نص" },
+        { name: "المنطقة", name_en: "zone", type: "نص" },
+        { name: "الممر", name_en: "aisle", type: "نص" },
+        { name: "الرف", name_en: "rack", type: "نص" },
+        { name: "المستوى", name_en: "level", type: "نص" },
+        { name: "الخلية", name_en: "bin", type: "نص" },
+        { name: "السعة القصوى", name_en: "max_capacity", type: "عدد" },
+        { name: "وحدة السعة", name_en: "capacity_uom", type: "نص" },
+        { name: "الحالة", name_en: "status", type: "نص" }
       ]
     },
     {
-      id: "inventory",
-      name: "المخزون",
-      name_en: "Inventory",
-      category: "inventory_management",
-      description: "تتبع كميات المنتجات في كل موقع",
-      description_en: "Tracking product quantities in each location",
+      id: "inbound_orders",
+      name: "طلبات الوارد",
+      name_en: "Inbound Orders",
+      category: "operations_management",
+      description: "طلبات استلام البضائع الواردة",
+      description_en: "Incoming goods receipt orders",
       columns: [
-        {name: "inventory_key", type: "BIGSERIAL", primary_key: true, description: "المفتاح الأساسي للمخزون"},
-        {name: "product_key", type: "BIGINT", not_null: true, foreign_key: "products.product_key", description: "المفتاح الخارجي للمنتج"},
-        {name: "location_key", type: "BIGINT", not_null: true, foreign_key: "locations.location_key", description: "المفتاح الخارجي للموقع"},
-        {name: "lot_number", type: "VARCHAR(64)", description: "رقم الدفعة"},
-        {name: "quantity", type: "NUMERIC(19,4)", not_null: true, default: "0", description: "الكمية المتاحة"},
-        {name: "allocated_quantity", type: "NUMERIC(19,4)", default: "0", description: "الكمية المخصصة"},
-        {name: "uom_id", type: "VARCHAR(64)", description: "معرف وحدة القياس"},
-        {name: "status", type: "VARCHAR(32)", default: "AVAILABLE", description: "حالة المخزون (متاح، محجوز، معيب، إلخ)"},
-        {name: "expiration_date", type: "TIMESTAMP", description: "تاريخ انتهاء الصلاحية"},
-        {name: "class_type", type: "VARCHAR(32)", description: "نوع الفئة"},
-        {name: "transaction_count", type: "NUMERIC(10)", description: "عدد المعاملات"},
-        {name: "created_by", type: "VARCHAR(64)", description: "تم إنشاؤه بواسطة"},
-        {name: "create_date", type: "TIMESTAMP", default: "CURRENT_TIMESTAMP", description: "تاريخ الإنشاء"},
-        {name: "updated_by", type: "VARCHAR(64)", description: "تم تحديثه بواسطة"},
-        {name: "update_date", type: "TIMESTAMP", default: "CURRENT_TIMESTAMP", description: "تاريخ التحديث"}
-      ],
-      relationships: [
-        {table: "products", type: "many-to-one", description: "المخزون ينتمي إلى منتج"},
-        {table: "locations", type: "many-to-one", description: "المخزون موجود في موقع"},
-        {table: "inventory_transactions", type: "one-to-many", description: "المخزون له عدة معاملات"}
-      ],
-      usage_tips: [
-        {
-          title: "تتبع المخزون حسب الموقع",
-          description: "يتم تتبع المخزون على مستوى الموقع. كل سجل يمثل كمية منتج في موقع محدد.",
-          example: "SELECT p.name, i.quantity, l.location_id FROM inventory i JOIN products p ON i.product_key = p.product_key JOIN locations l ON i.location_key = l.location_key;"
-        },
-        {
-          title: "تتبع الدفعات وتواريخ انتهاء الصلاحية",
-          description: "استخدم حقول lot_number و expiration_date لتتبع الدفعات وتواريخ انتهاء الصلاحية للمنتجات.",
-          example: "SELECT * FROM inventory WHERE expiration_date < CURRENT_DATE + INTERVAL '30 days';"
-        }
+        { name: "رقم الطلب", name_en: "order_id", type: "رقم", primaryKey: true },
+        { name: "نوع الطلب", name_en: "order_type", type: "نص" },
+        { name: "رقم المورد", name_en: "supplier_id", type: "رقم", foreignKey: "suppliers" },
+        { name: "تاريخ الطلب", name_en: "order_date", type: "تاريخ" },
+        { name: "تاريخ الاستلام المتوقع", name_en: "expected_receipt_date", type: "تاريخ" },
+        { name: "حالة الطلب", name_en: "status", type: "نص" },
+        { name: "ملاحظات", name_en: "notes", type: "نص" },
+        { name: "تاريخ الإنشاء", name_en: "created_at", type: "تاريخ ووقت" },
+        { name: "المستخدم المنشئ", name_en: "created_by", type: "رقم", foreignKey: "users" }
       ]
     },
     {
-      id: "inventory_transactions",
-      name: "معاملات المخزون",
-      name_en: "Inventory Transactions",
-      category: "inventory_management",
-      description: "سجل حركات المخزون (استلام، صرف، تحويل، تعديل)",
-      description_en: "Record of inventory movements (receipt, issue, transfer, adjustment)",
+      id: "inbound_order_lines",
+      name: "بنود طلبات الوارد",
+      name_en: "Inbound Order Lines",
+      category: "operations_management",
+      description: "تفاصيل بنود طلبات الوارد",
+      description_en: "Inbound order line details",
       columns: [
-        { name: "transaction_key", type: "BIGSERIAL", primary_key: true, description: "المفتاح الأساسي للمعاملة" },
-        { name: "transaction_type", type: "VARCHAR(64)", not_null: true, description: "نوع المعاملة (إضافة، خصم، تعديل، تحويل)" },
-        { name: "product_key", type: "BIGINT", not_null: true, foreign_key: "products.product_key", description: "المفتاح الخارجي للمنتج" },
-        { name: "location_key", type: "BIGINT", not_null: true, foreign_key: "locations.location_key", description: "المفتاح الخارجي للموقع" },
-        { name: "quantity", type: "NUMERIC(19,4)", not_null: true, default: "0", description: "الكمية المعنية بالمعاملة" },
-        { name: "transaction_date", type: "TIMESTAMP", default: "CURRENT_TIMESTAMP", description: "تاريخ المعاملة" },
-        { name: "created_by", type: "VARCHAR(64)", description: "تم إنشاؤه بواسطة" },
-        { name: "updated_by", type: "VARCHAR(64)", description: "تم تحديثه بواسطة" }
+        { name: "رقم البند", name_en: "line_id", type: "رقم", primaryKey: true },
+        { name: "رقم الطلب", name_en: "order_id", type: "رقم", foreignKey: "inbound_orders" },
+        { name: "رقم المنتج", name_en: "product_id", type: "رقم", foreignKey: "products" },
+        { name: "الكمية المطلوبة", name_en: "expected_quantity", type: "عدد" },
+        { name: "الكمية المستلمة", name_en: "received_quantity", type: "عدد" },
+        { name: "وحدة القياس", name_en: "uom", type: "نص" },
+        { name: "رقم الدفعة", name_en: "lot_number", type: "نص" },
+        { name: "تاريخ الإنتاج", name_en: "production_date", type: "تاريخ" },
+        { name: "تاريخ انتهاء الصلاحية", name_en: "expiry_date", type: "تاريخ" },
+        { name: "حالة البند", name_en: "status", type: "نص" }
+      ]
+    },
+    {
+      id: "outbound_orders",
+      name: "طلبات الصادر",
+      name_en: "Outbound Orders",
+      category: "operations_management",
+      description: "طلبات شحن البضائع الصادرة",
+      description_en: "Outgoing goods shipment orders",
+      columns: [
+        { name: "رقم الطلب", name_en: "order_id", type: "رقم", primaryKey: true },
+        { name: "نوع الطلب", name_en: "order_type", type: "نص" },
+        { name: "رقم العميل", name_en: "customer_id", type: "رقم", foreignKey: "customers" },
+        { name: "تاريخ الطلب", name_en: "order_date", type: "تاريخ" },
+        { name: "تاريخ الشحن المطلوب", name_en: "requested_ship_date", type: "تاريخ" },
+        { name: "أولوية الطلب", name_en: "priority", type: "نص" },
+        { name: "حالة الطلب", name_en: "status", type: "نص" },
+        { name: "ملاحظات", name_en: "notes", type: "نص" },
+        { name: "تاريخ الإنشاء", name_en: "created_at", type: "تاريخ ووقت" },
+        { name: "المستخدم المنشئ", name_en: "created_by", type: "رقم", foreignKey: "users" }
+      ]
+    },
+    {
+      id: "outbound_order_lines",
+      name: "بنود طلبات الصادر",
+      name_en: "Outbound Order Lines",
+      category: "operations_management",
+      description: "تفاصيل بنود طلبات الصادر",
+      description_en: "Outbound order line details",
+      columns: [
+        { name: "رقم البند", name_en: "line_id", type: "رقم", primaryKey: true },
+        { name: "رقم الطلب", name_en: "order_id", type: "رقم", foreignKey: "outbound_orders" },
+        { name: "رقم المنتج", name_en: "product_id", type: "رقم", foreignKey: "products" },
+        { name: "الكمية المطلوبة", name_en: "requested_quantity", type: "عدد" },
+        { name: "الكمية المشحونة", name_en: "shipped_quantity", type: "عدد" },
+        { name: "وحدة القياس", name_en: "uom", type: "نص" },
+        { name: "رقم الدفعة", name_en: "lot_number", type: "نص" },
+        { name: "حالة البند", name_en: "status", type: "نص" }
+      ]
+    },
+    {
+      id: "work_orders",
+      name: "أوامر العمل",
+      name_en: "Work Orders",
+      category: "operations_management",
+      description: "أوامر العمل للعمليات الداخلية",
+      description_en: "Work orders for internal operations",
+      columns: [
+        { name: "رقم أمر العمل", name_en: "work_order_id", type: "رقم", primaryKey: true },
+        { name: "نوع أمر العمل", name_en: "work_order_type", type: "نص" },
+        { name: "تاريخ الإنشاء", name_en: "creation_date", type: "تاريخ" },
+        { name: "تاريخ البدء المخطط", name_en: "planned_start_date", type: "تاريخ" },
+        { name: "تاريخ الانتهاء المخطط", name_en: "planned_end_date", type: "تاريخ" },
+        { name: "تاريخ البدء الفعلي", name_en: "actual_start_date", type: "تاريخ" },
+        { name: "تاريخ الانتهاء الفعلي", name_en: "actual_end_date", type: "تاريخ" },
+        { name: "حالة أمر العمل", name_en: "status", type: "نص" },
+        { name: "الأولوية", name_en: "priority", type: "نص" },
+        { name: "ملاحظات", name_en: "notes", type: "نص" },
+        { name: "المستخدم المنشئ", name_en: "created_by", type: "رقم", foreignKey: "users" }
+      ]
+    },
+    {
+      id: "work_order_lines",
+      name: "بنود أوامر العمل",
+      name_en: "Work Order Lines",
+      category: "operations_management",
+      description: "تفاصيل بنود أوامر العمل",
+      description_en: "Work order line details",
+      columns: [
+        { name: "رقم البند", name_en: "line_id", type: "رقم", primaryKey: true },
+        { name: "رقم أمر العمل", name_en: "work_order_id", type: "رقم", foreignKey: "work_orders" },
+        { name: "رقم المنتج", name_en: "product_id", type: "رقم", foreignKey: "products" },
+        { name: "الكمية المخططة", name_en: "planned_quantity", type: "عدد" },
+        { name: "الكمية المنجزة", name_en: "completed_quantity", type: "عدد" },
+        { name: "وحدة القياس", name_en: "uom", type: "نص" },
+        { name: "حالة البند", name_en: "status", type: "نص" },
+        { name: "ملاحظات", name_en: "notes", type: "نص" }
+      ]
+    },
+    {
+      id: "purchase_orders",
+      name: "طلبات الشراء",
+      name_en: "Purchase Orders",
+      category: "operations_management",
+      description: "إدارة طلبات الشراء من الموردين",
+      description_en: "Managing purchase orders from suppliers",
+      columns: [
+        { name: "رقم الطلب", name_en: "order_id", type: "رقم", primaryKey: true },
+        { name: "تاريخ الطلب", name_en: "order_date", type: "تاريخ" },
+        { name: "رقم المورد", name_en: "supplier_id", type: "رقم", foreignKey: "suppliers" },
+        { name: "حالة الطلب", name_en: "status", type: "نص" },
+        { name: "إجمالي القيمة", name_en: "total_value", type: "عدد" },
+        { name: "تاريخ التسليم المتوقع", name_en: "expected_delivery_date", type: "تاريخ" },
+        { name: "ملاحظات", name_en: "notes", type: "نص" },
+        { name: "تاريخ الإنشاء", name_en: "created_at", type: "تاريخ ووقت" },
+        { name: "المستخدم المنشئ", name_en: "created_by", type: "رقم", foreignKey: "users" }
+      ]
+    },
+    {
+      id: "goods_receipt",
+      name: "استلام البضائع",
+      name_en: "Goods Receipt",
+      category: "operations_management",
+      description: "تسجيل عمليات استلام البضائع في المستودع",
+      description_en: "Recording goods receipt operations in the warehouse",
+      columns: [
+        { name: "رقم الاستلام", name_en: "receipt_id", type: "رقم", primaryKey: true },
+        { name: "تاريخ الاستلام", name_en: "receipt_date", type: "تاريخ" },
+        { name: "رقم طلب الشراء", name_en: "purchase_order_id", type: "رقم", foreignKey: "purchase_orders" },
+        { name: "المستلم", name_en: "receiver", type: "نص" },
+        { name: "حالة الاستلام", name_en: "status", type: "نص" },
+        { name: "ملاحظات", name_en: "notes", type: "نص" },
+        { name: "تاريخ الإنشاء", name_en: "created_at", type: "تاريخ ووقت" },
+        { name: "المستخدم المنشئ", name_en: "created_by", type: "رقم", foreignKey: "users" }
+      ]
+    },
+    {
+      id: "supply_orders",
+      name: "طلبات التوريد",
+      name_en: "Supply Orders",
+      category: "operations_management",
+      description: "إدارة طلبات توريد المنتجات للعملاء",
+      description_en: "Managing product supply orders for customers",
+      columns: [
+        { name: "رقم طلب التوريد", name_en: "supply_order_id", type: "رقم", primaryKey: true },
+        { name: "تاريخ الطلب", name_en: "order_date", type: "تاريخ" },
+        { name: "رقم العميل", name_en: "customer_id", type: "رقم", foreignKey: "customers" },
+        { name: "حالة الطلب", name_en: "status", type: "نص" },
+        { name: "إجمالي القيمة", name_en: "total_value", type: "عدد" },
+        { name: "تاريخ التسليم المطلوب", name_en: "requested_delivery_date", type: "تاريخ" },
+        { name: "أولوية الطلب", name_en: "priority", type: "نص" },
+        { name: "ملاحظات", name_en: "notes", type: "نص" },
+        { name: "تاريخ الإنشاء", name_en: "created_at", type: "تاريخ ووقت" },
+        { name: "المستخدم المنشئ", name_en: "created_by", type: "رقم", foreignKey: "users" }
+      ]
+    },
+    {
+      id: "goods_shipment",
+      name: "شحن البضائع",
+      name_en: "Goods Shipment",
+      category: "operations_management",
+      description: "تسجيل عمليات شحن البضائع من المستودع",
+      description_en: "Recording goods shipment operations from the warehouse",
+      columns: [
+        { name: "رقم الشحنة", name_en: "shipment_id", type: "رقم", primaryKey: true },
+        { name: "تاريخ الشحن", name_en: "shipment_date", type: "تاريخ" },
+        { name: "رقم طلب التوريد", name_en: "supply_order_id", type: "رقم", foreignKey: "supply_orders" },
+        { name: "شركة الشحن", name_en: "shipping_company", type: "نص" },
+        { name: "رقم تتبع الشحنة", name_en: "tracking_number", type: "نص" },
+        { name: "حالة الشحن", name_en: "status", type: "نص" },
+        { name: "تكلفة الشحن", name_en: "shipping_cost", type: "عدد" },
+        { name: "ملاحظات", name_en: "notes", type: "نص" },
+        { name: "تاريخ الإنشاء", name_en: "created_at", type: "تاريخ ووقت" },
+        { name: "المستخدم المنشئ", name_en: "created_by", type: "رقم", foreignKey: "users" }
+      ]
+    },
+    {
+      id: "products",
+      name: "المنتجات",
+      name_en: "Products",
+      category: "product_management",
+      description: "بيانات المنتجات الأساسية",
+      description_en: "Basic product data",
+      columns: [
+        { name: "رقم المنتج", name_en: "product_id", type: "رقم", primaryKey: true },
+        { name: "اسم المنتج", name_en: "product_name", type: "نص" },
+        { name: "الوصف", name_en: "description", type: "نص" },
+        { name: "الباركود", name_en: "barcode", type: "نص" },
+        { name: "SKU", name_en: "sku", type: "نص" },
+        { name: "رقم الفئة", name_en: "category_id", type: "رقم", foreignKey: "product_categories" },
+        { name: "رقم العائلة", name_en: "family_id", type: "رقم", foreignKey: "product_families" },
+        { name: "رقم المالك", name_en: "owner_id", type: "رقم", foreignKey: "owners" },
+        { name: "وحدة القياس", name_en: "uom", type: "نص" },
+        { name: "الوزن", name_en: "weight", type: "عدد" },
+        { name: "وحدة الوزن", name_en: "weight_uom", type: "نص" },
+        { name: "الحجم", name_en: "volume", type: "عدد" },
+        { name: "وحدة الحجم", name_en: "volume_uom", type: "نص" },
+        { name: "الحالة", name_en: "status", type: "نص" }
+      ]
+    },
+    {
+      id: "product_categories",
+      name: "فئات المنتجات",
+      name_en: "Product Categories",
+      category: "product_management",
+      description: "فئات تصنيف المنتجات",
+      description_en: "Product classification categories",
+      columns: [
+        { name: "رقم الفئة", name_en: "category_id", type: "رقم", primaryKey: true },
+        { name: "اسم الفئة", name_en: "category_name", type: "نص" },
+        { name: "الوصف", name_en: "description", type: "نص" },
+        { name: "الفئة الأب", name_en: "parent_category_id", type: "رقم", foreignKey: "product_categories" }
+      ]
+    },
+    {
+      id: "product_families",
+      name: "عائلات المنتجات",
+      name_en: "Product Families",
+      category: "product_management",
+      description: "عائلات المنتجات المتشابهة",
+      description_en: "Families of similar products",
+      columns: [
+        { name: "رقم العائلة", name_en: "family_id", type: "رقم", primaryKey: true },
+        { name: "اسم العائلة", name_en: "family_name", type: "نص" },
+        { name: "الوصف", name_en: "description", type: "نص" }
+      ]
+    },
+    {
+      id: "owners",
+      name: "مالكي المنتجات",
+      name_en: "Product Owners",
+      category: "product_management",
+      description: "الشركات المالكة للمنتجات",
+      description_en: "Companies owning the products",
+      columns: [
+        { name: "رقم المالك", name_en: "owner_id", type: "رقم", primaryKey: true },
+        { name: "اسم المالك", name_en: "owner_name", type: "نص" },
+        { name: "جهة الاتصال", name_en: "contact_person", type: "نص" },
+        { name: "البريد الإلكتروني", name_en: "email", type: "نص" },
+        { name: "رقم الهاتف", name_en: "phone", type: "نص" },
+        { name: "العنوان", name_en: "address", type: "نص" }
+      ]
+    },
+    {
+      id: "product_classifications",
+      name: "تصنيفات المنتجات",
+      name_en: "Product Classifications",
+      category: "product_management",
+      description: "إدارة تصنيفات وفئات المنتجات",
+      description_en: "Managing product classifications and categories",
+      columns: [
+        { name: "رقم التصنيف", name_en: "classification_id", type: "رقم", primaryKey: true },
+        { name: "اسم التصنيف", name_en: "classification_name", type: "نص" },
+        { name: "التصنيف الأب", name_en: "parent_classification_id", type: "رقم", foreignKey: "product_classifications" },
+        { name: "الوصف", name_en: "description", type: "نص" },
+        { name: "تاريخ الإنشاء", name_en: "created_at", type: "تاريخ" },
+        { name: "الحالة", name_en: "status", type: "نص" }
+      ]
+    },
+    {
+      id: "measurement_units",
+      name: "وحدات القياس",
+      name_en: "Measurement Units",
+      category: "product_management",
+      description: "إدارة وحدات قياس المنتجات",
+      description_en: "Managing product measurement units",
+      columns: [
+        { name: "رقم الوحدة", name_en: "unit_id", type: "رقم", primaryKey: true },
+        { name: "اسم الوحدة", name_en: "unit_name", type: "نص" },
+        { name: "الرمز", name_en: "symbol", type: "نص" },
+        { name: "الوصف", name_en: "description", type: "نص" },
+        { name: "معامل التحويل", name_en: "conversion_factor", type: "عدد" },
+        { name: "الوحدة الأساسية", name_en: "base_unit", type: "نص" }
+      ]
+    },
+    {
+      id: "product_specifications",
+      name: "مواصفات المنتجات",
+      name_en: "Product Specifications",
+      category: "product_management",
+      description: "تفاصيل مواصفات وخصائص المنتجات",
+      description_en: "Details of product specifications and characteristics",
+      columns: [
+        { name: "رقم المواصفة", name_en: "specification_id", type: "رقم", primaryKey: true },
+        { name: "رقم المنتج", name_en: "product_id", type: "رقم", foreignKey: "products" },
+        { name: "اسم الخاصية", name_en: "attribute_name", type: "نص" },
+        { name: "قيمة الخاصية", name_en: "attribute_value", type: "نص" },
+        { name: "وحدة القياس", name_en: "unit_of_measure", type: "نص" },
+        { name: "ملاحظات", name_en: "notes", type: "نص" }
+      ]
+    },
+    {
+      id: "product_alternatives",
+      name: "بدائل المنتجات",
+      name_en: "Product Alternatives",
+      category: "product_management",
+      description: "إدارة البدائل المتاحة للمنتجات",
+      description_en: "Managing available alternatives for products",
+      columns: [
+        { name: "رقم البديل", name_en: "alternative_id", type: "رقم", primaryKey: true },
+        { name: "رقم المنتج الأساسي", name_en: "primary_product_id", type: "رقم", foreignKey: "products" },
+        { name: "رقم المنتج البديل", name_en: "alternative_product_id", type: "رقم", foreignKey: "products" },
+        { name: "نسبة التوافق", name_en: "compatibility_percentage", type: "عدد" },
+        { name: "ملاحظات", name_en: "notes", type: "نص" }
+      ]
+    },
+    {
+      id: "product_images",
+      name: "صور المنتجات",
+      name_en: "Product Images",
+      category: "product_management",
+      description: "إدارة الصور والمرفقات الخاصة بالمنتجات",
+      description_en: "Managing images and attachments for products",
+      columns: [
+        { name: "رقم الصورة", name_en: "image_id", type: "رقم", primaryKey: true },
+        { name: "رقم المنتج", name_en: "product_id", type: "رقم", foreignKey: "products" },
+        { name: "اسم الملف", name_en: "file_name", type: "نص" },
+        { name: "نوع الملف", name_en: "file_type", type: "نص" },
+        { name: "حجم الملف", name_en: "file_size", type: "عدد" },
+        { name: "تاريخ الرفع", name_en: "upload_date", type: "تاريخ" },
+        { name: "الوصف", name_en: "description", type: "نص" }
       ]
     }
   ]
