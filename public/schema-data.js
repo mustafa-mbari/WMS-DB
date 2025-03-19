@@ -283,5 +283,15 @@ const schemaData = {
       description: "سجل حركات المخزون (استلام، صرف، تحويل، تعديل)",
       description_en: "Record of inventory movements (receipt, issue, transfer, adjustment)",
       columns: [
-        {name: "transaction_key", type: "BIGSERIAL", primary_key: true, description: "المفتاح الأساسي للمعاملة"},
-        {name: "transaction_<response clipped><NOTE>To save on context only part of this file has been shown to you. You should retry this tool after you have searched inside the file with `grep -n` in order to find the line numbers of what you are looking for.</NOTE>
+        { name: "transaction_key", type: "BIGSERIAL", primary_key: true, description: "المفتاح الأساسي للمعاملة" },
+        { name: "transaction_type", type: "VARCHAR(64)", not_null: true, description: "نوع المعاملة (إضافة، خصم، تعديل، تحويل)" },
+        { name: "product_key", type: "BIGINT", not_null: true, foreign_key: "products.product_key", description: "المفتاح الخارجي للمنتج" },
+        { name: "location_key", type: "BIGINT", not_null: true, foreign_key: "locations.location_key", description: "المفتاح الخارجي للموقع" },
+        { name: "quantity", type: "NUMERIC(19,4)", not_null: true, default: "0", description: "الكمية المعنية بالمعاملة" },
+        { name: "transaction_date", type: "TIMESTAMP", default: "CURRENT_TIMESTAMP", description: "تاريخ المعاملة" },
+        { name: "created_by", type: "VARCHAR(64)", description: "تم إنشاؤه بواسطة" },
+        { name: "updated_by", type: "VARCHAR(64)", description: "تم تحديثه بواسطة" }
+      ]
+    }
+  ]
+};
