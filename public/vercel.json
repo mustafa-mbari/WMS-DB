@@ -1,0 +1,6 @@
+{
+  "rewrites": [
+    { "source": "/schema-data.js", "destination": "/public/schema-data.js" },
+    { "source": "/app.js", "destination": "/public/app.js" }
+  ]
+}
